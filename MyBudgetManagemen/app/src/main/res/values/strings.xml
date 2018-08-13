@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MyBudgetManagemen</string>
+    <string-array name="array_unit">
+        <item>VND</item>
+        <item>USD</item>
+        <item>EUR</item>
+    </string-array>
+</resources>
