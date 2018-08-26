@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_corner_layout"
+    android:padding="8dp"
+    android:layout_margin="2dp"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="time: "
+        android:textAllCaps="false"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:id="@+id/txt_time"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ksdnjnjnd"
+        android:textColor="#EF5350"
+        android:fontFamily="sans-serif-condensed"
+        android:textStyle="bold"
+        android:id="@+id/txt_money_amount"
+        android:layout_toRightOf="@id/txt_time"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit_grey_24dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="4dp"
+        android:background="@android:color/transparent"
+        android:id="@+id/btn_edit"/>
+
+</RelativeLayout>

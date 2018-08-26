@@ -11,10 +11,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.PaymentViewHolder>  {
+public class StatisticListAdapter extends RecyclerView.Adapter<StatisticListAdapter.StatisticViewHolder>  {
 
 
-    List<Payment> paymentList = new ArrayList<>();
+    List<Statistic> statisticList = new ArrayList<>();
     private Context mContext;
     private OnEditClickListener mEditListener;
     private OnItemLongClickListener mLongClickListener;
@@ -36,61 +36,60 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
         mLongClickListener = listener;
     }
 
-    public PaymentListAdapter(Context context){
+    public StatisticListAdapter(Context context){
         mContext = context;
     }
 
     @Override
-    public PaymentViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_budget,viewGroup,false);
-        return new PaymentViewHolder(itemView);
+    public StatisticViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_statistic,viewGroup,false);
+        return new StatisticViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(PaymentViewHolder paymentViewHolder, int i) {
-        Payment payment = paymentList.get(i);
+    public void onBindViewHolder(StatisticViewHolder viewHolder, int i) {
+        Statistic statistic = statisticList.get(i);
 
-        paymentViewHolder.txtTime.setText(payment.getTimeAsString() +": ");
-        paymentViewHolder.txtMoneyAmount.setText(payment.getMoneyAsString());
+        viewHolder.txtTime.setText(statistic.getTimeAsStringFromMonth() +": ");
+        viewHolder.txtMoneyAmount.setText(statistic.getMoneyAsString());
 
     }
 
-    public void setPaymentList(List<Payment> payment){
-        paymentList.clear();
-        paymentList.addAll(payment);
+    public void setStatisticList(List<Statistic> statisticList){
+        this.statisticList.addAll(statisticList);
         notifyDataSetChanged();
     }
 
-    public void addPayment(Payment payment){
-        paymentList.add(payment);
+    public void addStatistic(Statistic statistic){
+        statisticList.add(statistic);
         notifyDataSetChanged();
     }
 
-    public void editPayment(int position, Payment payment){
-        paymentList.set(position, payment);
+    public void editStatistic(int position, Statistic statistic){
+        statisticList.set(position, statistic);
         notifyDataSetChanged();
     }
 
-    public Payment getPayment(int position){
-        return paymentList.get(position);
+    public Statistic getStatistic(int position){
+        return statisticList.get(position);
     }
 
-    public void removePayment(int position){
-        paymentList.remove(position);
+    public void removeStatistic(int position){
+        statisticList.remove(position);
         notifyItemRemoved(position);
     }
 
     public long getTotalMoneyAmount(){
         long total = 0;
-        for (int i = 0 ; i < paymentList.size() ;i++){
-            if (paymentList.get(i).getPaymentUnit().equals("USD")){
-                total += paymentList.get(i).getMoneyAmount() * 22727;
+        for (int i = 0; i < statisticList.size() ; i++){
+            if (statisticList.get(i).getPaymentUnit().equals("USD")){
+                total += statisticList.get(i).getMoneyAmount() * 22727;
             }
-            if (paymentList.get(i).getPaymentUnit().equals("VND")){
-                total += paymentList.get(i).getMoneyAmount();
+            if (statisticList.get(i).getPaymentUnit().equals("VND")){
+                total += statisticList.get(i).getMoneyAmount();
             }
-            if (paymentList.get(i).getPaymentUnit().equals("EUR")){
-                total += paymentList.get(i).getMoneyAmount() * 26714;
+            if (statisticList.get(i).getPaymentUnit().equals("EUR")){
+                total += statisticList.get(i).getMoneyAmount() * 26714;
             }
         }
 
@@ -99,22 +98,22 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
 
     @Override
     public int getItemCount() {
-        return paymentList.size();
+        return statisticList.size();
     }
 
-    class PaymentViewHolder extends RecyclerView.ViewHolder{
+    class StatisticViewHolder extends RecyclerView.ViewHolder{
 
         TextView txtTime;
         TextView txtMoneyAmount;
         ImageButton btnEdit;
 
-        public PaymentViewHolder(final View itemView) {
+        public StatisticViewHolder(final View itemView) {
             super(itemView);
 
             txtTime = itemView.findViewById(R.id.txt_time);
             txtMoneyAmount = itemView.findViewById(R.id.txt_money_amount);
             btnEdit = itemView.findViewById(R.id.btn_edit);
-
+            btnEdit.setVisibility(View.GONE);
             btnEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

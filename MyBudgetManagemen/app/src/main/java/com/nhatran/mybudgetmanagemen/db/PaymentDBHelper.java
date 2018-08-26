@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.nhatran.mybudgetmanagemen.Payment;
+import com.nhatran.mybudgetmanagemen.Statistic;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,8 +19,9 @@ import java.util.List;
 public class PaymentDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "PaymentManagement";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String TABLE_NAME = "Payment";
+    private static final String TABLE_NAME2 = "Statistic";
 
     private static final String KEY_ID = "id";
     private static final String KEY_TIME = "time";
@@ -35,9 +37,10 @@ public class PaymentDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String create_students_table = String.format("CREATE TABLE %s(%s INTEGER PRIMARY KEY, %s TEXT, %s TEXT, %s TEXT)", TABLE_NAME, KEY_ID, KEY_TIME, KEY_MONEY, KEY_UNIT);
+        String create_students_table2 = String.format("CREATE TABLE %s(%s INTEGER PRIMARY KEY, %s TEXT, %s TEXT, %s TEXT)", TABLE_NAME2, KEY_ID, KEY_TIME, KEY_MONEY, KEY_UNIT);
         sqLiteDatabase.execSQL(create_students_table);
+        sqLiteDatabase.execSQL(create_students_table2);
     }
-
 
     public void addPayment(Payment payment){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -49,6 +52,38 @@ public class PaymentDBHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, contentValues);
         db.close();
     }
+
+    public void addStatistic(Statistic statistic){
+
+        if (getStatistic(statistic.getTimeAsString()) != null){
+            updateStatistic(statistic);
+        }else{
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(KEY_TIME, statistic.getTimeAsString());
+            contentValues.put(KEY_MONEY, String.valueOf(statistic.getMoneyAmount()));
+            contentValues.put(KEY_UNIT, statistic.getPaymentUnit());
+
+            db.insert(TABLE_NAME2, null, contentValues);
+            db.close();
+        }
+
+    }
+
+    public Cursor getStatistic(String time){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME2, null, KEY_TIME+" = ?", new String[] {time},null,null,null);
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        if (cursor.moveToFirst()){
+            return cursor;
+        }
+
+
+        return null;
+    }
+
 
     public void saveTotalAndDate(long total, String fromDate, String toDate){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -145,6 +180,30 @@ public class PaymentDBHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    public List<Payment> getPaymentsInPeriodTime(Date fromDate, Date toDate){
+        List<Payment> payments = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        cursor.moveToFirst();
+
+        while (cursor.isAfterLast() == false){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(
+                    "dd/MM/yyyy");
+            try {
+                Date date = dateFormat.parse(cursor.getString(1));
+                if (date.getTime() >= fromDate.getTime()  && date.getTime() <= toDate.getTime()){
+                    payments.add(new Payment(cursor.getInt(0), date, Long.valueOf(cursor.getString(2)), cursor.getString(3)));
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            cursor.moveToNext();
+        }
+        return payments;
+    }
+
     public List<Payment> getAllPayments(){
         List<Payment> payments = new ArrayList<>();
         String query = "SELECT * FROM " + TABLE_NAME;
@@ -167,6 +226,28 @@ public class PaymentDBHelper extends SQLiteOpenHelper {
         return payments;
     }
 
+    public List<Statistic> getAlStatistic(){
+        List<Statistic> statistics = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_NAME2;
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        cursor.moveToFirst();
+
+        while (cursor.isAfterLast() == false){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(
+                    "dd/MM/yyyy");
+            try {
+                Date date = dateFormat.parse(cursor.getString(1));
+                statistics.add(new Statistic(cursor.getInt(0), date, Long.valueOf(cursor.getString(2)), cursor.getString(3)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            cursor.moveToNext();
+        }
+        return statistics;
+    }
+
     public void updatePayment(Payment payment){
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -177,9 +258,24 @@ public class PaymentDBHelper extends SQLiteOpenHelper {
         database.close();
     }
 
+    public void updateStatistic(Statistic statistic){
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_TIME, statistic.getTimeAsString());
+        values.put(KEY_MONEY, String.valueOf(statistic.getMoneyAmount()));
+        values.put(KEY_UNIT, statistic.getPaymentUnit());
+        database.update(TABLE_NAME2, values, KEY_TIME + " = ?", new String[] { statistic.getTimeAsString() });
+        database.close();
+    }
+
     public void deletePayment(int id){
         SQLiteDatabase db = this.getReadableDatabase();
         db.delete(TABLE_NAME,KEY_ID + " = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+    public void deleteStatistic(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.delete(TABLE_NAME2,KEY_ID + " = ?", new String[]{String.valueOf(id)});
         db.close();
     }
 
